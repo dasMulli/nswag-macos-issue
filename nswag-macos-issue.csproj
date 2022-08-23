@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>nswag_macos_issue</RootNamespace>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NSwag.Annotations" Version="13.16.1" />
+    <PackageReference Include="NSwag.Core" Version="13.16.1" />
+    <PackageReference Include="NSwag.AspNetCore" Version="13.16.1" />
+    <PackageReference Include="NSwag.MSBuild" Version="13.16.1" PrivateAssets="All" />
+  </ItemGroup>
+
+  <Target Name="BuildOpenApiSpec" AfterTargets="PostBuildEvent" Inputs="@(ReferencePathWithRefAssemblies);@(IntermediateRefAssembly)" Outputs="openapi.json">
+    <Exec EnvironmentVariables="ASPNETCORE_ENVIRONMENT=Development" Command="$(NSwagExe_Net60) aspnetcore2openapi &quot;/assembly:$(TargetPath)&quot; /output:openapi.json /useDocumentProvider:true" />
+    <!-- NSwag may not update the file if unchaged, so touch them to fix incremental build behavior -->
+    <Touch Files="openapi.json" />
+  </Target>
+</Project>
